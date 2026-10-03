@@ -1,0 +1,495 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   ARLETH NEW STYLE — DESIGN SYSTEM
+   Art direction: editorial barbershop sheet. Near-black ink, warm paper,
+   burnt-copper accent. Hairline rules instead of cards. Sharp corners.
+   Section index labels in mono create horizontal rhythm across the page.
+   ========================================================================== */
+
+@theme {
+  /* --- Colour ------------------------------------------------------------ */
+  /* --- Colour ------------------------------------------------------------
+     Every text token below is contrast-checked against --color-ink (#0a0a09).
+     Ratios are noted so the scale is not re-broken by accident:
+
+       paper       #f3efe7  17.4 : 1
+       paper-dim   #cbc5b8  11.6 : 1
+       mute        #9d9a92   7.1 : 1   secondary body
+       mute-dim    #7e7c75   4.8 : 1   metadata / labels (small text floor)
+       ember       #d9713c   6.1 : 1   ACCENT TEXT on ink
+       ember-deep  #a94a1c   3.5 : 1   ACCENT BACKGROUND (paper text on it: 5.0 : 1)
+
+     ember is for type on dark; ember-deep is for filled surfaces. They are
+     deliberately different colours because one copper cannot serve both jobs
+     at WCAG AA.
+     -------------------------------------------------------------------- */
+  --color-ink: #0a0a09;
+  --color-ink-raised: #111110;
+  --color-ink-lift: #181816;
+  --color-ink-line: #232220;
+  --color-ink-line-soft: #1a1917;
+
+  --color-paper: #f3efe7;
+  --color-paper-dim: #cbc5b8;
+  --color-mute: #9d9a92;
+  --color-mute-dim: #7e7c75;
+
+  --color-ember: #d9713c;
+  --color-ember-soft: #e08a52;
+  --color-ember-deep: #a94a1c;
+
+  /* --- Type -------------------------------------------------------------- */
+  --font-display: var(--font-archivo), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Sharp, disciplined geometry. No soft "app" corners. */
+  --radius-none: 0px;
+
+  /* --- Motion ------------------------------------------------------------ */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ============================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-ink-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* clears the sticky header when jumping to an anchor */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+    /* Safety net: full-bleed art must never produce a sideways scrollbar.
+       `clip` (not `hidden`) so it cannot become a scroll container. */
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Room for the mobile action bar so it never covers content. */
+  @media (max-width: 767px) {
+    body {
+      padding-bottom: 4.25rem;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.88;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-ember-deep);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember-soft);
+    outline-offset: 3px;
+  }
+
+  img {
+    /* Photography stays crisp — no default drag ghosting */
+    -webkit-user-drag: none;
+  }
+
+  /* Firefox scrollbar polish on desktop */
+  @media (min-width: 768px) {
+    html {
+      scrollbar-color: var(--color-ink-line) var(--color-ink);
+    }
+  }
+}
+
+/* ============================================================================
+   TYPOGRAPHY UTILITIES
+   ========================================================================== */
+
+/* Hero wordmark — sized against its own column (cqw), not the viewport, so the
+   long second line never spills into the photograph. */
+@utility hero-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2.375rem, 14cqw, 7rem);
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+@utility display-lg {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.25rem, 5.6vw, 5rem);
+  line-height: 0.88;
+  letter-spacing: -0.038em;
+  text-transform: uppercase;
+}
+
+@utility display-md {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 4.6vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: -0.032em;
+  text-transform: uppercase;
+}
+
+@utility display-sm {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.375rem, 2.6vw, 2.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.028em;
+  text-transform: uppercase;
+}
+
+/* Small uppercase mono label — the connective tissue of the whole layout */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+@utility label-sm {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+@utility body-lg {
+  font-size: clamp(1.0625rem, 1.35vw, 1.3125rem);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+@utility body-md {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+/* Long display lines wrap to their own line box on narrow columns rather than
+   spilling out of their grid track. */
+@utility balance-lines {
+  text-wrap: balance;
+  overflow-wrap: normal;
+}
+
+/* Outline display type — used once, for emphasis, never as filler */
+@utility text-stroke {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-mute);
+  text-stroke: 1.5px var(--color-mute);
+}
+
+@utility text-stroke-strong {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--color-paper);
+  text-stroke: 2px var(--color-paper);
+}
+
+/* ============================================================================
+   LAYOUT
+   ========================================================================== */
+
+/* Full-bleed gutters used by every section so the grid feels continuous */
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 100rem;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .shell {
+    padding-inline: 2.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .shell {
+    padding-inline: 4rem;
+  }
+}
+
+@utility section-y {
+  padding-block: 4.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-y {
+    padding-block: 7rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .section-y {
+    padding-block: 9rem;
+  }
+}
+
+/* Full-bleed escape from the shell, for edge-to-edge imagery */
+@utility bleed-x {
+  margin-inline: calc(50% - 50vw);
+  width: 100vw;
+}
+
+/* Establishes an inline-size query container so cqw units inside resolve
+   against this element's own width. */
+@utility query-col {
+  container-type: inline-size;
+}
+
+/* ============================================================================
+   COMPONENTS
+   ========================================================================== */
+
+@utility rule-t {
+  border-top: 1px solid var(--color-ink-line);
+}
+
+@utility hairline {
+  height: 1px;
+  background-color: var(--color-ink-line);
+  width: 100%;
+}
+
+/* Primary button — solid ember, wipes to paper on hover */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1;
+    padding: 1.0625rem 1.75rem;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    transition: color 320ms var(--ease-out-expo);
+    white-space: nowrap;
+  }
+
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--color-paper);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 380ms var(--ease-out-expo);
+  }
+
+  .btn:hover::before,
+  .btn:focus-visible::before {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+
+  .btn-primary {
+    background-color: var(--color-ember-deep);
+    color: var(--color-paper);
+  }
+
+  .btn-outline {
+    border: 1px solid var(--color-ink-line);
+    color: var(--color-paper);
+  }
+
+  .btn-outline:hover,
+  .btn-outline:focus-visible {
+    color: var(--color-ink);
+    border-color: var(--color-paper);
+  }
+
+  .btn-ghost {
+    color: var(--color-paper-dim);
+    padding-inline: 0;
+    padding-block: 0.5rem;
+  }
+
+  .btn-ghost::before {
+    display: none;
+  }
+
+  .btn-ghost:hover,
+  .btn-ghost:focus-visible {
+    color: var(--color-ember-soft);
+  }
+
+  /* Animated underline for text links */
+  .link-underline {
+    position: relative;
+    display: inline-block;
+  }
+
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 380ms var(--ease-out-expo);
+  }
+
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Photography frame */
+  .frame {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-ink-lift);
+  }
+
+  .frame img {
+    transition: transform 900ms var(--ease-out-expo),
+      filter 900ms var(--ease-out-expo);
+    will-change: transform;
+  }
+
+  .frame-hover:hover img,
+  .frame-hover:focus-visible img {
+    transform: scale(1.045);
+  }
+
+  /* Hover index tag that slides in over a photo */
+  .frame-tag {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+    background-color: var(--color-ember-deep);
+    color: var(--color-paper);
+    padding: 0.5rem 0.75rem;
+    transform: translateY(101%);
+    transition: transform 420ms var(--ease-out-expo);
+  }
+
+  .frame-hover:hover .frame-tag,
+  .frame-hover:focus-visible .frame-tag {
+    transform: translateY(0);
+  }
+
+  /* Scroll reveal — opt-in, disabled under reduced motion */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 800ms var(--ease-out-expo),
+      transform 800ms var(--ease-out-expo);
+  }
+
+  .reveal[data-visible="true"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hairline that draws itself in when its section is revealed */
+  .rule-draw {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1100ms var(--ease-out-expo);
+  }
+
+  .rule-draw[data-visible="true"] {
+    transform: scaleX(1);
+  }
+
+  /* Skip link */
+  .skip-link {
+    position: absolute;
+    left: 0.75rem;
+    top: -100%;
+    z-index: 200;
+    background-color: var(--color-ember-deep);
+    color: var(--color-paper);
+    padding: 1rem 1.5rem;
+    transition: top 200ms var(--ease-out-expo);
+  }
+
+  .skip-link:focus {
+    top: 0.75rem;
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .rule-draw {
+    transform: scaleX(1);
+  }
+
+  .frame img,
+  .frame-hover:hover img {
+    transform: none;
+  }
+
+  .btn::before {
+    display: none;
+  }
+}
