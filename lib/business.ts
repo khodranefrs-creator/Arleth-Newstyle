@@ -268,7 +268,7 @@ export const reviews = {
     },
   ],
   attribution:
-    "Themes summarised from the shop's public Google review record. Individual reviews are read in full on Google.",
+    "Themes and mention counts summarised from the shop's public review record. Individual reviews are read in full on Google.",
   cta: "View Google reviews",
   href: maps.listing,
 } as const;
@@ -344,72 +344,80 @@ export type Photo = {
   caption?: string;
 };
 
+/**
+ * PHOTOGRAPHY
+ * ---------------------------------------------------------------------------
+ * The shop has exactly THREE owner-uploaded photographs in circulation (its
+ * Google Business Profile) plus the avatar published on its official Linktree.
+ *
+ * The site used to ship ten files — six "gallery" frames, a shop-section photo
+ * and a full-bleed band — all re-crops of those same three images. Perceptual
+ * hashing confirmed `interior.webp` and `work-02.webp` were the same frame
+ * (dHash distance 2), so the visitor saw one photograph twice within ~1400px
+ * of scrolling while the strip below claimed "6 photographs".
+ *
+ * Rule now enforced: one photograph, one placement, per viewport. Each image
+ * is used at most once on the page, and each is described only in terms that
+ * are actually verifiable ("the shop interior") — never an unverified claim
+ * about what is in frame ("the working area", "the upper part of the shop").
+ *
+ * Allocation:
+ *   google-01  ->  hero (tall)  +  community band (wide)   [~7000px apart]
+ *   google-02  ->  gallery, portrait frame
+ *   google-03  ->  gallery, landscape frame
+ *
+ * The hero/band pair is the single deliberate repeat. They sit roughly eight
+ * viewport-heights apart, are cropped to opposite orientations (3:4 and 2:1),
+ * and the band is read as atmosphere under a heavy scrim rather than as a
+ * second look at the shop. Everything closer together is unique.
+ * ---------------------------------------------------------------------------
+ */
+
 export const heroPhoto: Photo = {
   src: "/images/arleth/hero.webp",
-  alt: "Photograph of Arleth New Style Barbershop, 10850 S Gessner Rd, Houston — an interior view of the shop.",
+  alt: "Photograph of the Arleth New Style Barbershop interior, 10850 S Gessner Rd, Houston.",
   width: 1100,
   height: 1467,
   index: "01",
 };
 
+/** One frame per unique photograph. Do not add re-crops of these. */
 export const galleryPhotos: Photo[] = [
   {
     src: "/images/arleth/work-01.webp",
-    alt: "Interior view inside Arleth New Style Barbershop on S Gessner Rd in Houston.",
+    alt: "Photograph of the Arleth New Style Barbershop interior, Houston.",
     width: 1100,
     height: 1467,
     index: "02",
   },
   {
     src: "/images/arleth/work-02.webp",
-    alt: "Wide view of the shop floor and chairs at Arleth New Style Barbershop, Houston.",
+    alt: "Photograph of the Arleth New Style Barbershop interior, Houston.",
     width: 1600,
     height: 1200,
     index: "03",
   },
-  {
-    src: "/images/arleth/work-03.webp",
-    alt: "Close view of the barbershop at Arleth New Style, showing the working area.",
-    width: 1200,
-    height: 1200,
-    index: "04",
-  },
-  {
-    src: "/images/arleth/work-04.webp",
-    alt: "Detail view of the upper part of the shop at Arleth New Style Barbershop.",
-    width: 1600,
-    height: 900,
-    index: "05",
-  },
-  {
-    src: "/images/arleth/interior.webp",
-    alt: "The interior of Arleth New Style Barbershop in Houston, Texas.",
-    width: 1400,
-    height: 1050,
-    index: "06",
-  },
-  {
-    src: "/images/arleth/detail-02.webp",
-    alt: "Vertical detail of the barbershop interior at Arleth New Style, Houston.",
-    width: 1000,
-    height: 1400,
-    index: "07",
-  },
 ];
 
-export const shopPhoto: Photo = {
-  src: "/images/arleth/interior.webp",
-  alt: "The interior of Arleth New Style Barbershop on S Gessner Rd, Houston.",
-  width: 1400,
-  height: 1050,
-  index: "S",
-};
-
+/**
+ * Community band. Desktop uses the wide (2:1) crop; below `md` the band
+ * reuses the hero's existing 3:4 file, because cover-fitting a 2:1 frame into
+ * a 78svh phone viewport (≈320x624, ratio 0.51) leaves only the middle ~26%
+ * of the photograph visible. Same asset, opposite framing, no new file.
+ */
 export const bandPhoto: Photo = {
   src: "/images/arleth/detail-01.webp",
-  alt: "Detail of the barbershop interior at Arleth New Style, Houston.",
+  alt: "Photograph of the Arleth New Style Barbershop interior, Houston.",
   width: 1600,
   height: 800,
+  index: "B",
+};
+
+export const bandTallPhoto: Photo = {
+  src: "/images/arleth/hero.webp",
+  alt: "Photograph of the Arleth New Style Barbershop interior, Houston.",
+  width: 1100,
+  height: 1467,
   index: "B",
 };
 
@@ -439,7 +447,14 @@ export const nav = [
 export const seo = {
   title: "Arleth New Style Barbershop | Houston, TX",
   description:
-    "Arleth New Style Barbershop at 10850 S Gessner Rd, Houston, TX 77071. Haircuts and barber services in Brays Oaks. Walk-ins and appointments welcome — call, WhatsApp, or DM on Instagram to book your cut.",
+    "Arleth New Style Barbershop at 10850 S Gessner Rd, Houston, TX 77071. Haircuts and barber services in Brays Oaks. Walk-ins and appointments welcome - call, WhatsApp, or DM on Instagram to book your cut.",
+  /* Canonical alt text for the generated share card. Declared here because
+     Next's file-based metadata convention lets the `alt` export in
+     app/opengraph-image.tsx OVERRIDE metadata.openGraph.images[].alt in
+     layout.tsx. Two copies silently disagreed, so the clumsy
+     "Arleth New Style Barbershop - Barbershop in Houston, TX" won. Both
+     call sites now reference this single value. */
+  ogImageAlt: "Arleth New Style Barbershop - barbershop at 10850 S Gessner Rd, Houston, TX 77071",
   keywords: [
     "Arleth New Style Barbershop",
     "barbershop Houston",

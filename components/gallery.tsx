@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { galleryPhotos, instagram, tiktok, type Photo } from "@/lib/business";
-import { ArrowUpRight, Close } from "@/components/icons";
+import { Close } from "@/components/icons";
 import { Reveal, SectionLabel } from "@/components/reveal";
 
 type Slot = {
@@ -14,13 +14,19 @@ type Slot = {
   offset?: string;
 };
 
+/**
+ * Grid placement + aspect ratio. Every row sums to exactly 12 columns on
+ * `md` and up, so there is never a partially-filled row.
+ *
+ * This was six frames before. Because only three unique photographs exist,
+ * that meant the same picture appeared twice inside a few thousand pixels —
+ * and the trailing "live feed" panel sat alone in a 4-column row, leaving
+ * 67-68% of that row as dead space at every width from 768px up. Two unique
+ * frames plus a full-width panel fill both rows completely.
+ */
 const slots: Slot[] = [
-  { photo: galleryPhotos[0], span: "col-span-4 md:col-span-7", ratio: "aspect-[3/4]" },
-  { photo: galleryPhotos[1], span: "col-span-4 md:col-span-5", ratio: "aspect-[4/3]" },
-  { photo: galleryPhotos[2], span: "col-span-2 md:col-span-4", ratio: "aspect-square" },
-  { photo: galleryPhotos[3], span: "col-span-2 md:col-span-8", ratio: "aspect-[16/9]" },
-  { photo: galleryPhotos[4], span: "col-span-4 md:col-span-7", ratio: "aspect-[4/3]" },
-  { photo: galleryPhotos[5], span: "col-span-4 md:col-span-5", ratio: "aspect-[5/7]" },
+  { photo: galleryPhotos[0], span: "col-span-6 md:col-span-5", ratio: "aspect-[3/4]" },
+  { photo: galleryPhotos[1], span: "col-span-6 md:col-span-7", ratio: "aspect-[4/3]" },
 ];
 
 export default function Gallery() {
@@ -85,10 +91,9 @@ export default function Gallery() {
           <div className="lg:col-span-5 lg:pb-3">
             <Reveal delay={120}>
               <p className="body-md max-w-[44ch] text-paper-dim">
-                Real photographs from{" "}
-                <span className="text-paper">10850 S Gessner Rd</span> — the room, the chairs,
-                the work. For the full feed of fresh cuts, the shop posts daily on Instagram and
-                TikTok.
+                Photographs of the shop at{" "}
+                <span className="text-paper">10850 S Gessner Rd</span>. For fresh cuts as they
+                happen, the shop posts throughout the week on Instagram and TikTok.
               </p>
             </Reveal>
           </div>
@@ -116,8 +121,7 @@ export default function Gallery() {
                     width={slot.photo.width}
                     height={slot.photo.height}
                     loading="lazy"
-                    quality={78}
-                    sizes="(max-width: 767px) 50vw, (max-width: 1279px) 40vw, 45vw"
+                    sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 42vw"
                     className="h-full w-full object-cover"
                   />
                   <span className="frame-tag label-sm" aria-hidden="true">
@@ -127,37 +131,35 @@ export default function Gallery() {
               </Reveal>
             ))}
 
-            {/* Non-photographic panel — keeps the grid honest and drives the feed */}
-            <Reveal className="col-span-4 md:col-span-4" delay={120}>
-              <div className="flex aspect-square flex-col justify-between bg-ember-deep p-5 text-paper md:p-6">
-                <div className="flex items-start justify-between">
+            {/* Non-photographic panel — a full-width band so the grid closes
+                cleanly instead of leaving a partial row. */}
+            <Reveal className="col-span-12" delay={120}>
+              <div className="flex flex-col gap-6 bg-ember-deep p-6 text-paper sm:flex-row sm:items-end sm:justify-between md:p-8">
+                <div className="max-w-md">
                   <span className="label-sm text-paper">Live feed</span>
-                  <ArrowUpRight className="size-4" />
-                </div>
-                <div>
-                  <p className="display-sm leading-[0.95]">
+                  <p className="display-sm mt-4 leading-[0.95]">
                     {tiktok.handle}
                     <br />
                     {instagram.handle}
                   </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    <a
-                      href={instagram.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="label-sm border border-paper/40 px-4 py-3 transition-colors hover:border-paper hover:bg-paper hover:text-ember-deep"
-                    >
-                      Instagram
-                    </a>
-                    <a
-                      href={tiktok.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="label-sm border border-paper/40 px-4 py-3 transition-colors hover:border-paper hover:bg-paper hover:text-ember-deep"
-                    >
-                      TikTok
-                    </a>
-                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href={instagram.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="label-sm border border-paper/40 px-4 py-3 transition-colors hover:border-paper hover:bg-paper hover:text-ember-deep"
+                  >
+                    Instagram
+                  </a>
+                  <a
+                    href={tiktok.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="label-sm border border-paper/40 px-4 py-3 transition-colors hover:border-paper hover:bg-paper hover:text-ember-deep"
+                  >
+                    TikTok
+                  </a>
                 </div>
               </div>
             </Reveal>
@@ -169,7 +171,7 @@ export default function Gallery() {
       <div className="shell">
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-ink-line pt-5">
           <p className="label-sm text-mute-dim">
-            {galleryPhotos.length} photographs · Arleth New Style, Houston
+            Photographs of the shop · Arleth New Style, Houston
           </p>
           <p className="label-sm text-mute-dim">Tap any frame to enlarge</p>
         </div>

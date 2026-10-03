@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { shop, shopPhoto, address } from "@/lib/business";
+import { shop, address } from "@/lib/business";
 import { ArrowUpRight } from "@/components/icons";
 import { Reveal, SectionLabel } from "@/components/reveal";
 import { maps } from "@/lib/business";
@@ -8,29 +7,11 @@ export default function Shop() {
   return (
     <section id="shop" aria-labelledby="shop-heading" className="section-y border-t border-ink-line-soft">
       <div className="shell">
+        {/* The photograph that used to sit here was the same frame as a gallery
+            tile a few hundred pixels above — identical file, identical pixels.
+            The section reads as a typographic column instead. */}
         <div className="grid grid-cols-1 gap-x-10 gap-y-10 lg:grid-cols-12">
-          {/* Photograph — bleeds off the LEFT edge to vary the rhythm */}
-          <Reveal className="-mx-5 lg:col-span-6 lg:mx-0 lg:-ml-10 xl:-ml-16">
-            <figure className="frame frame-hover group relative aspect-4/3 w-full lg:aspect-[4/5]">
-              <Image
-                src={shopPhoto.src}
-                alt={shopPhoto.alt}
-                width={shopPhoto.width}
-                height={shopPhoto.height}
-                loading="lazy"
-                quality={80}
-                sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 48vw, 40vw"
-                className="h-full w-full object-cover"
-              />
-              <span aria-hidden="true" className="absolute inset-y-0 right-0 w-px bg-ember/70" />
-              <figcaption className="label-sm absolute bottom-0 left-0 bg-ink/85 px-3 py-2 text-paper-dim backdrop-blur-sm">
-                {address.line1} · {address.line2}
-              </figcaption>
-            </figure>
-          </Reveal>
-
-          {/* Text + spec table */}
-          <div className="lg:col-span-6 lg:pl-8 xl:pl-12">
+          <div className="lg:col-span-7 lg:col-start-4 xl:col-span-6 xl:col-start-4">
             <Reveal>
               <SectionLabel index="04" title="The shop" />
             </Reveal>
@@ -65,6 +46,13 @@ export default function Shop() {
             </Reveal>
 
             <Reveal delay={240}>
+              <p className="label-sm mt-8 flex items-center gap-3 text-mute-dim">
+                <span className="h-px w-8 bg-ink-line" aria-hidden="true" />
+                {address.line1} · {address.line2}
+              </p>
+            </Reveal>
+
+            <Reveal delay={300}>
               <a
                 href={maps.directions}
                 target="_blank"

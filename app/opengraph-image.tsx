@@ -1,18 +1,27 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { address, contact, identity } from "@/lib/business";
+import { address, contact, identity, seo } from "@/lib/business";
 
-export const alt = `${identity.name} — ${identity.trade} in ${identity.city}, ${identity.state}`;
+export const alt = seo.ogImageAlt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OpengraphImage() {
   /* The shop's own photograph, embedded so the share card is never generic.
-     JPEG because satori cannot decode WebP. */
-  const photo = await readFile(
-    path.join(process.cwd(), "public", "images", "arleth", "og-source.jpg"),
-  );
+     JPEG because satori cannot decode WebP. Lives in assets/, not public/, so
+     the 230KB source is never deployed as a fetchable asset. */
+  const photo = await readFile(path.join(process.cwd(), "assets", "og-source.jpg"));
+
+  /* Mirrors the tokens in app/globals.css. These were previously the old
+     pre-contrast-audit values (#c2552a / #8a8880), which made the share card
+     visibly inconsistent with the site and failed AA on the small label. */
+  const INK = "#0a0a09";
+  const PAPER = "#f3efe7";
+  const PAPER_DIM = "#cbc5b8";
+  const MUTE = "#9d9a92";
+  const EMBER = "#d9713c";
+  const LINE = "#232220";
 
   return new ImageResponse(
     (
@@ -21,8 +30,8 @@ export default async function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          backgroundColor: "#0a0a09",
-          color: "#f3efe7",
+          backgroundColor: INK,
+          color: PAPER,
           fontFamily: "sans-serif",
         }}
       >
@@ -37,13 +46,13 @@ export default async function OpengraphImage() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 7, height: 7, backgroundColor: "#c2552a" }} />
+            <div style={{ width: 7, height: 7, backgroundColor: EMBER }} />
             <div
               style={{
                 fontSize: 17,
                 letterSpacing: 5,
                 textTransform: "uppercase",
-                color: "#c2552a",
+                color: EMBER,
                 display: "flex",
               }}
             >
@@ -71,7 +80,7 @@ export default async function OpengraphImage() {
                 lineHeight: 0.86,
                 letterSpacing: -4,
                 textTransform: "uppercase",
-                color: "#8a8880",
+                color: MUTE,
                 display: "flex",
               }}
             >
@@ -81,9 +90,9 @@ export default async function OpengraphImage() {
               style={{
                 marginTop: 26,
                 paddingTop: 18,
-                borderTop: "1px solid #232220",
+                borderTop: `1px solid ${LINE}`,
                 fontSize: 20,
-                color: "#cbc5b8",
+                color: PAPER_DIM,
                 display: "flex",
               }}
             >
@@ -97,12 +106,12 @@ export default async function OpengraphImage() {
               gap: 28,
               fontSize: 18,
               letterSpacing: 1.5,
-              color: "#8a8880",
+              color: MUTE,
               textTransform: "uppercase",
             }}
           >
             <div style={{ display: "flex" }}>{address.line1}</div>
-            <div style={{ display: "flex", color: "#f3efe7" }}>{contact.phoneDisplay}</div>
+            <div style={{ display: "flex", color: PAPER }}>{contact.phoneDisplay}</div>
           </div>
         </div>
 
@@ -128,7 +137,7 @@ export default async function OpengraphImage() {
               top: 0,
               bottom: 0,
               width: 3,
-              backgroundColor: "#c2552a",
+              backgroundColor: EMBER,
               display: "flex",
             }}
           />

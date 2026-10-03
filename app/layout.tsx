@@ -1,16 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Manrope, IBM_Plex_Mono } from "next/font/google";
 import { address, contact, identity, seo, socials, maps, location } from "@/lib/business";
+import { siteUrl, warnIfUnresolvedOrigin } from "@/lib/site-url";
 import "./globals.css";
 
 /**
  * Set NEXT_PUBLIC_SITE_URL to the real production domain before launch.
- * See README.md — this value feeds canonical URLs, Open Graph tags and schema.
+ * See README.md and lib/site-url.ts — this value feeds canonical URLs,
+ * Open Graph tags and schema, and an incorrect value is invisible locally.
  */
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://arlethnewstyle.com").replace(
-  /\/$/,
-  "",
-);
+warnIfUnresolvedOrigin();
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -58,7 +57,10 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: `${identity.name} — ${address.line1}, ${address.line2}`,
+        /* Keep in sync with the `alt` export in opengraph-image.tsx, which
+           takes precedence under Next's file-based metadata convention. Both
+           read from seo.ogImageAlt so they cannot drift apart. */
+        alt: seo.ogImageAlt,
       },
     ],
   },

@@ -28,7 +28,23 @@ npm run audit      # Playwright layout / a11y / contrast audit
 
 | Variable | Required | Notes |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | in production | Canonical origin used for metadata, canonical links, Open Graph, `sitemap.xml` and `robots.txt`. Falls back to `https://arlethnewstyle.com`, which **must** be replaced with the real domain before launch. |
+| `NEXT_PUBLIC_SITE_URL` | optional | Canonical origin used for metadata, canonical links, Open Graph, `sitemap.xml` and `robots.txt`. **No custom domain is configured yet**, so production currently resolves via `VERCEL_PROJECT_PRODUCTION_URL` (injected by Vercel at build time) to `https://arleth-newstyle.vercel.app`. Set this variable explicitly when a real domain is added. See `lib/site-url.ts`. |
+
+### Site origin
+
+`lib/site-url.ts` is the single source of truth for the absolute origin, resolved in
+this order:
+
+1. `NEXT_PUBLIC_SITE_URL`
+2. `VERCEL_PROJECT_PRODUCTION_URL` — injected automatically on Vercel builds
+3. `http://localhost:3000` — local development
+
+An earlier revision hardcoded `https://arlethnewstyle.com` as the fallback. That
+domain has no DNS record, and it shipped: canonical, `og:url`, `og:image`, the
+sitemap and `robots.txt` all pointed at a dead host. Nothing looked broken at
+build time, which is exactly why there is now **no invented default** — the
+fallback is an obviously-local origin, and `warnIfUnresolvedOrigin()` prints a
+build warning when it is in use.
 
 ---
 
@@ -65,8 +81,25 @@ Business Profile plus the avatar published on the official Linktree. Originals a
 kept out of git in `scripts/_raw/` (gitignored); `npm run images` produces the
 optimised WebP set in `public/images/arleth/`.
 
+**There are only three unique shop photographs.** The site used to ship ten files
+from those three sources; perceptual hashing proved several were the same frame
+(`interior.webp` and `work-02.webp` were a dHash distance of 2 apart), so the
+page repeated itself and the gallery strip claimed "6 photographs" while showing
+three pictures. The current rule, enforced in `lib/business.ts`:
+
+- one photograph, one placement per page
+- no re-crops added merely to fill space
+- alt text describes only what is verifiable ("the shop interior"), never an
+  unverified claim about what is in frame
+
+Allocation: `google-01` → hero (tall) and the community band (wide, ~7000px
+apart — the single deliberate repeat); `google-02` → gallery portrait;
+`google-03` → gallery landscape.
+
 The shop's Instagram media could not be retrieved programmatically (the public
-endpoints rate-limit or require auth), so no Instagram imagery is used.
+endpoints return a rate-limited or JS-only shell and the media API requires
+auth), so no Instagram imagery is used and nothing is claimed to come from it.
+`scripts/image-audit.mjs` re-checks for duplicates via perceptual hashing.
 
 ---
 
@@ -121,14 +154,20 @@ app/
   layout.tsx           fonts, metadata, JSON-LD (BarberShop + WebSite)
   page.tsx             homepage composition
   globals.css          design tokens, type scale, utilities
-  opengraph-image.tsx  branded share image (built from real photography)
-  icon.svg           favicon
+opengraph-image.tsx  branded share image (built from real photography)
+  icon.svg             favicon
   robots.ts sitemap.ts
 components/            one file per section + header/footer/reveal
 lib/business.ts        single source of truth for all verified facts
+assets/
+  og-source.jpg        build-time input for the OG card (not deployed)
 scripts/
   optimize-images.mjs  Sharp crop/resize pipeline
   audit.mjs            Playwright layout/a11y/contrast audit
+  image-audit.mjs      perceptual-hash duplicate + image-quality forensics
+  layout-audit.mjs     per-image render geometry, section heights, console errors
+  network-audit.mjs    real image downloads, CLS, overflow
+  probe-gallery.mjs    gallery grid row-packing / void check
   probe.mjs            computed-style diagnostics
   _raw/                original photography (gitignored)
 ```
@@ -139,5 +178,6 @@ scripts/
 
 The build is fully static (`next build` prerenders `/`, the OG image, the icon,
 `robots.txt` and `sitemap.xml`) and can be deployed to any Node host or
-static-aware platform. Set `NEXT_PUBLIC_SITE_URL` to the production origin
-before building.
+static-aware platform. On Vercel no configuration is needed — the production
+origin is injected automatically. On any other host, set `NEXT_PUBLIC_SITE_URL`
+to that host's origin before building.

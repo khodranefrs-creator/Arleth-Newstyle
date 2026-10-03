@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { community, bandPhoto, contact } from "@/lib/business";
+import { community, bandPhoto, bandTallPhoto, contact } from "@/lib/business";
 import { ArrowUpRight, Phone } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 
@@ -7,15 +7,30 @@ export default function Community() {
   return (
     <section aria-labelledby="community-heading" className="relative isolate overflow-hidden">
       <div className="relative min-h-[78svh] w-full md:min-h-[86svh]">
+        {/* Art direction. A 2:1 frame cover-fitted into a 78svh phone viewport
+            (≈320x624, ratio 0.51) leaves only the middle ~26% of the
+            photograph on screen, so mobile gets a 3:4 crop of the same shot
+            instead. Exactly one of the two is ever displayed, and the hidden
+            one is never fetched. */}
+        <Image
+          src={bandTallPhoto.src}
+          alt={bandTallPhoto.alt}
+          width={bandTallPhoto.width}
+          height={bandTallPhoto.height}
+          loading="lazy"
+          quality={75}
+          sizes="100vw"
+          className="absolute inset-0 -z-10 h-full w-full object-cover md:hidden"
+        />
         <Image
           src={bandPhoto.src}
           alt={bandPhoto.alt}
           width={bandPhoto.width}
           height={bandPhoto.height}
           loading="lazy"
-          quality={74}
+          quality={75}
           sizes="100vw"
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
+          className="absolute inset-0 -z-10 hidden h-full w-full object-cover md:block"
         />
         {/* Legibility scrim — a single horizontal gradient, left-weighted */}
         <div
